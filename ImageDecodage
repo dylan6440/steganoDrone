@@ -1,0 +1,54 @@
+#include <iostream>
+#include <string>
+#include <QImage>
+#include <QColor>
+
+class ImageDecodage {
+public:
+    explicit ImageDecodage(const std::string& imagePath)
+        : m_image(QString::fromStdString(imagePath))
+    {}
+
+    std::string DecrypterMessage() {
+        if (m_image.isNull()) {
+            std::cout << "Impossible d'ouvrir l'image " << m_imagePath.toStdString() << std::endl;
+            return "";
+        }
+
+        std::string s_binaryMessage;
+
+        for (int y = 0; y < m_image.height(); ++y) {
+            for (int x = 0; x < m_image.width(); ++x) {
+                QColor pixelColor = m_image.pixelColor(x, y);
+                s_binaryMessage += std::to_string(pixelColor.red() & 0x01);
+                s_binaryMessage += std::to_string(pixelColor.green() & 0x01);
+                s_binaryMessage += std::to_string(pixelColor.blue() & 0x01);
+            }
+        }
+
+        std::string s_message;
+
+        for (std::size_t i = 0; i < s_binaryMessage.length(); i += 8) {
+            std::string byte = s_binaryMessage.substr(i, 8);
+            char character = static_cast<char>(std::stoi(byte, nullptr, 2));
+            s_message += character;
+            if (character == '\0') {
+                break;
+            }
+        }
+
+        return s_message;
+    }
+
+private:
+    QImage m_image;
+};
+
+int main() {
+    std::string s_imagePath = "DroneIMG37337.png";
+    ImageDecodage decrypter(s_imagePath);
+    std::string s_message = decrypter.DecrypterMessage();
+    std::cout << "Le message déchiffré est : " << s_message << std::endl;
+
+        return 0;
+}
