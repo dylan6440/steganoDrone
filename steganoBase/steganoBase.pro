@@ -29,7 +29,7 @@ SOURCES += \
 
 HEADERS += \
         mainwindow.h \
-    paql.h
+        paql.h
 
 FORMS += \
         mainwindow.ui

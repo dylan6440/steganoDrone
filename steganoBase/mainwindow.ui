@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1008</width>
-    <height>539</height>
+    <width>1104</width>
+    <height>609</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -25,8 +25,8 @@
      <rect>
       <x>40</x>
       <y>20</y>
-      <width>921</width>
-      <height>458</height>
+      <width>1041</width>
+      <height>501</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -49,21 +49,8 @@
         </spacer>
        </item>
        <item>
-        <layout class="QVBoxLayout" name="verticalLayoutMqtt">
-         <item>
-          <widget class="QLabel" name="label">
-           <property name="text">
-            <string>HostName MQTT</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QTextEdit" name="textEdit_HNMQTT"/>
-         </item>
-         <item>
+        <layout class="QGridLayout" name="gridLayout">
+         <item row="2" column="0">
           <widget class="QLabel" name="label_2">
            <property name="font">
             <font>
@@ -83,23 +70,7 @@
            </property>
           </widget>
          </item>
-         <item>
-          <widget class="QTextEdit" name="textEdit_PMQTT"/>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_4">
-           <property name="text">
-            <string>Username MQTT</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QTextEdit" name="textEdit_UNMQTT"/>
-         </item>
-         <item>
+         <item row="2" column="1">
           <widget class="QLabel" name="label_5">
            <property name="text">
             <string>PassWord MQTT</string>
@@ -109,10 +80,52 @@
            </property>
           </widget>
          </item>
-         <item>
+         <item row="1" column="0">
+          <widget class="QTextEdit" name="textEdit_HNMQTT"/>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="label_7">
+           <property name="text">
+            <string>Topic</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLabel" name="label_4">
+           <property name="text">
+            <string>Username MQTT</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QTextEdit" name="textEdit_PMQTT"/>
+         </item>
+         <item row="1" column="1">
+          <widget class="QTextEdit" name="textEdit_UNMQTT"/>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>HostName MQTT</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
           <widget class="QTextEdit" name="textEdit_PWMQTT"/>
          </item>
-         <item>
+         <item row="5" column="0">
+          <widget class="QTextEdit" name="textEdit_topic"/>
+         </item>
+         <item row="5" column="1">
           <widget class="QPushButton" name="pushButtonConnection">
            <property name="text">
             <string>Connection</string>
@@ -220,7 +233,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1008</width>
+     <width>1104</width>
      <height>22</height>
     </rect>
    </property>
