@@ -61,7 +61,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QTextEdit" name="textEdit"/>
+          <widget class="QTextEdit" name="textEdit_HNMQTT"/>
          </item>
          <item>
           <widget class="QLabel" name="label_2">
@@ -84,7 +84,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QTextEdit" name="textEdit_2"/>
+          <widget class="QTextEdit" name="textEdit_PMQTT"/>
          </item>
          <item>
           <widget class="QLabel" name="label_4">
@@ -97,7 +97,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QTextEdit" name="textEdit_3"/>
+          <widget class="QTextEdit" name="textEdit_UNMQTT"/>
          </item>
          <item>
           <widget class="QLabel" name="label_5">
@@ -110,7 +110,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QTextEdit" name="textEdit_4"/>
+          <widget class="QTextEdit" name="textEdit_PWMQTT"/>
          </item>
          <item>
           <widget class="QPushButton" name="pushButtonConnection">
@@ -147,7 +147,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QTextBrowser" name="textBrowser"/>
+          <widget class="QTextBrowser" name="textBrowserMessage"/>
          </item>
         </layout>
        </item>

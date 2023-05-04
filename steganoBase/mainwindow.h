@@ -1,6 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "paql.h"
 #include <QMainWindow>
 
 namespace Ui {
@@ -16,16 +17,16 @@ public:
     ~MainWindow();
 
 public  slots:
-    void getBroker(void);
-    void getTopic(void);
     void mqttConnection(void);
     void close(void);
 
 
 private:
     Ui::MainWindow *ui;
-    QString s_mqttTopic;
-    QString s_mqttBroker;
+    QString s_mqttHostName;
+    QString s_mqttPort;
+    QString s_mqttUserName;
+    QString s_mqttPassWord;
     QString s_message;
     QString s_image;
 };
