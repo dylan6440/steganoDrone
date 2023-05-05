@@ -1,10 +1,10 @@
 #include "traitementimages.h"
+#include "paql.h"
 #include <QString>
 #include <QImage>
 #include <QtDebug>
 #include <iostream>
 #include <QFile>
-#define char_t char
 #include <QColor>
 
 traitementImages::traitementImages(QObject *parent)
