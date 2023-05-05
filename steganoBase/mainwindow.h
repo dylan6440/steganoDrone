@@ -38,7 +38,7 @@ private:
     QThread thr_DetectedMessage;
 
 private:
-    void decodeImage(const QByteArray &s_message);
+    void decodeImage(const QByteArray codedImage);
 
 };
 

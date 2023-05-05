@@ -3,6 +3,7 @@
 #include <QDebug>
 #include <QFile>
 #include <QGraphicsPixmapItem>
+#include <iostream>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -33,7 +34,7 @@ void MainWindow::mqttConnection()
     if ((s_mqttHostName != NULL)&&(s_mqttPort != NULL)&&(s_mqttUserName != NULL)&&(s_mqttPassWord != NULL))
     {
         Client = new QMqttClient(this);
-//        QMqttClient Client;
+        //        QMqttClient Client;
 
         Client->setHostname(s_mqttHostName);
         Client->setPort(s_mqttPort.toInt());
@@ -68,19 +69,19 @@ void MainWindow::mqttConnection()
 
             // Vérifier que le message est une image
             if (topic.name() == s_mqttTopic) {
-                  decodeImage(s_message);
+                decodeImage(s_message);
                 // Enregistrer l'image dans un fichier
-//                QFile file("/home/yanis/received_image.png");
-//                if (!file.open(QIODevice::WriteOnly)) {
-//                    qDebug() << "Error opening file for writing";
-//                    return;
-//                }
-//                file.write(message);
-//                file.close();
+                //                QFile file("/home/yanis/received_image.png");
+                //                if (!file.open(QIODevice::WriteOnly)) {
+                //                    qDebug() << "Error opening file for writing";
+                //                    return;
+                //                }
+                //                file.write(message);
+                //                file.close();
                 ui->textBrowserMessage->setText(s_message);
 
 
-
+                decodeImage(s_message);
 
 
                 QImage image;
@@ -88,22 +89,23 @@ void MainWindow::mqttConnection()
 
                 image.loadFromData(s_message);
 
-                        // Créer un QGraphicsPixmapItem avec l'image convertie
-                        QGraphicsPixmapItem *pixmapItem = new QGraphicsPixmapItem(QPixmap::fromImage(image));
+                // Créer un QGraphicsPixmapItem avec l'image convertie
+                QGraphicsPixmapItem *pixmapItem = new QGraphicsPixmapItem(QPixmap::fromImage(image));
 
-                        // Ajouter le QGraphicsPixmapItem à la scène
-                        scene->addItem(pixmapItem);
-
-
+                // Ajouter le QGraphicsPixmapItem à la scène
+                scene->addItem(pixmapItem);
 
 
 
 
-//                QPixmap image(s_message);
-//                scene->addPixmap(image);
+
+
+                //                QPixmap image(s_message);
+                //                scene->addPixmap(image);
                 QRectF bounds = scene->itemsBoundingRect();
                 ui->graphicsView->fitInView(bounds, Qt::KeepAspectRatio);
                 ui->graphicsView->setScene(scene);
+
 
                 qDebug() << "Image received and saved";
             }
@@ -119,34 +121,46 @@ void MainWindow::mqttConnection()
     }
 }
 
-void MainWindow::decodeImage(const QByteArray &s_message)
+void MainWindow::decodeImage(QByteArray codedImage)
 {
-    // Charger l'image depuis le QByteArray
+    // Load the image
     QImage image;
-    if (!image.load("/home/yanis/mqttYnov/DroneIMG37337.png")) {
-        qDebug() << "Failed to load image from message data.";
-        return;
+    if (!image.loadFromData(codedImage)) {
+        std::cerr << "Impossible de charger l'image." << std::endl;
+//        return "error 0";
     }
+    std::cout << "Image chargée." << std::endl;
 
-    // Extraire les bits du message caché
-    QByteArray messageBytes;
-    for (int32_t i = 0; i < image.width(); i++) {
-        for (int32_t j = 0; j < image.height(); j++) {
-            QRgb pixel = image.pixel(i, j);
-            char_t byte = 0;
-            byte |= (qRed(pixel) & 1);
-            byte <<= 1;
-            byte |= (qGreen(pixel) & 1);
-            byte <<= 1;
-            byte |= (qBlue(pixel) & 1);
-            messageBytes.append(byte);
+    // Décoder les bits LSB de chaque pixel de l'image pour récupérer les données cachées
+    QByteArray binaryData;
+    for (int y = 0; y < image.height(); ++y) {
+        for (int x = 0; x < image.width(); ++x) {
+            QColor pixelColor = image.pixelColor(x, y);
+            binaryData.append(pixelColor.red() & 0x01);
+            binaryData.append(pixelColor.green() & 0x01);
+            binaryData.append(pixelColor.blue() & 0x01);
         }
     }
+    int32_t binarySize = binaryData.size();
+    // Convertir la séquence de bits en une chaîne de caractères
+    QByteArray secretData;
+    for (int32_t i = 0; i < binaryData.size(); i += 8) {
+        int32_t byte = 0;
+        for (int32_t j = 0; j < 8; ++j) {
+            byte <<= 1;
+            byte |= binaryData.at(i+j);
+        }
+        if (byte == '!')break;
+        secretData.append(byte);
+    }
 
-    // Décoder le message
-    QString message = QString::fromUtf8(messageBytes);
-    ui->textBrowserMessage->setText(message);
+    std::cout << "Message extrait de l'image." << std::endl;
+    QString secretText = QString::fromUtf8(secretData);
+    std::cout << "Message : " << secretText.toStdString() << std::endl;
+//    return secretText;
 }
+
+
 
 void MainWindow::close()
 {
