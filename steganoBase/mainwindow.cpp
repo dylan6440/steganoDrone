@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include <QDebug>
 #include <QFile>
+#include <QGraphicsPixmapItem>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -77,9 +78,27 @@ void MainWindow::mqttConnection()
                 ui->textBrowserMessage->setText(s_message);
 
 
-                QPixmap image(s_message);
+
+
+
+                QImage image;
                 QGraphicsScene *scene = new QGraphicsScene(this);
-                scene->addPixmap(image);
+
+                image.loadFromData(s_message);
+
+                        // Créer un QGraphicsPixmapItem avec l'image convertie
+                        QGraphicsPixmapItem *pixmapItem = new QGraphicsPixmapItem(QPixmap::fromImage(image));
+
+                        // Ajouter le QGraphicsPixmapItem à la scène
+                        scene->addItem(pixmapItem);
+
+
+
+
+
+
+//                QPixmap image(s_message);
+//                scene->addPixmap(image);
                 QRectF bounds = scene->itemsBoundingRect();
                 ui->graphicsView->fitInView(bounds, Qt::KeepAspectRatio);
                 ui->graphicsView->setScene(scene);
