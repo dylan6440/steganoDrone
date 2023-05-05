@@ -5,14 +5,13 @@
 #include <QFile>
 #include <QTimer>
 
-
 mqttSend::mqttSend(QObject *parent)
     :QObject(parent)
 {
     // initialisation des membres de la classe
 }
 
-void mqttSend::sendDataToMqtt(const QString hostName, int16_t port, QString username, QString password, const QMqttTopicName &topic, QString data)
+void mqttSend::sendDataToMqtt(const QString hostName, int16_t port, QString username, QString password, const QMqttTopicName &topic, QByteArray data)
 {
     client = new QMqttClient(this);
 
@@ -27,7 +26,7 @@ void mqttSend::sendDataToMqtt(const QString hostName, int16_t port, QString user
          qDebug() << "Client state:" << state;
 
         qint32 qos_var = 2;
-        QByteArray image_data = data.toUtf8();
+        QByteArray image_data = data;
 
         // Publier l'image sur MQTT
          if (state == QMqttClient::Connected) {
@@ -51,8 +50,6 @@ void mqttSend::sendDataToMqtt(const QString hostName, int16_t port, QString user
             });
          }
     });
-
-
 
     client->connectToHost();
 }

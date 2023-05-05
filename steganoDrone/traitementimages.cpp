@@ -6,6 +6,8 @@
 #include <iostream>
 #include <QFile>
 #include <QColor>
+#include <QImageWriter>
+#include <QBuffer>
 
 traitementImages::traitementImages(QObject *parent)
     : QObject(parent)
@@ -13,9 +15,12 @@ traitementImages::traitementImages(QObject *parent)
     // initialisation des membres de la classe
 }
 
-QString traitementImages::encodeImage(QString imagePath, QString secretMessage)
+QByteArray traitementImages::encodeImage(QString imagePath, QString secretMessage)
 {
+
     QFile file(imagePath);
+    QByteArray imageData;
+
     while (!file.exists()) {
         std::cout << "Entrez le chemin d'accès à l'image : ";
         std::string imagePath;
@@ -54,11 +59,13 @@ QString traitementImages::encodeImage(QString imagePath, QString secretMessage)
         if (byteIndex == messageLength - 1)break;
     }
     std::cout << "Message caché dans l'image." << std::endl;
-    QByteArray imageData;
-    QDataStream stream(&imageData, QIODevice::WriteOnly);
-    stream << image;
+
+    QBuffer buffer(&imageData);
+    buffer.open(QIODevice::WriteOnly);
+    image.save(&buffer, "PNG");
+
     QString encodedImage = QString::fromLatin1(imageData.toBase64().data());
     std::cout << "Image encodée en base64 : " << encodedImage.toStdString() << std::endl;
     file.close();
-    return encodedImage;
+    return imageData;
 }
