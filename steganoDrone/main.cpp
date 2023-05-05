@@ -8,11 +8,11 @@ int main(int argc, char *argv[])
 
     QString image_data;
     QMqttTopicName topicName;
-    topicName.setName("testynov_stegano");
+    topicName.setName("yanistest");
 
     traitementImages T;
     mqttSend MS;
     image_data = T.encodeImage(T.defaultPath, "lol");
     MS.sendDataToMqtt("broker.emqx.io",1883,"","",topicName,image_data);
-    return a.exec();
+    return a.exec(); 
 }

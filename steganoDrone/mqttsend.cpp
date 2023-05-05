@@ -35,6 +35,13 @@ void mqttSend::sendDataToMqtt(const QString hostName, int16_t port, QString user
                 qDebug() << "Error publishing message to topic:" << topic.name();
             } else {
                 qDebug() << "Published image to topic:" << topic.name();
+
+                // Déconnexion du broker MQTT
+                QObject::connect(client, &QMqttClient::connected, [&]() {
+                    client->disconnectFromHost();
+                    qDebug() << "Client state:" << state;
+                    exit(0);
+                });
             }
          } else if (state == QMqttClient::Disconnected) {
             // Start a timer to try to reconnect
@@ -45,6 +52,7 @@ void mqttSend::sendDataToMqtt(const QString hostName, int16_t port, QString user
          }
     });
 
-     client->connectToHost();
 
+
+    client->connectToHost();
 }
