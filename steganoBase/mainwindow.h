@@ -2,6 +2,8 @@
 #define MAINWINDOW_H
 
 #include "paql.h"
+#include <QtMqtt/QMqttClient>
+#include "qmqttclient.h"
 #include <QMainWindow>
 #include <QThread>
 
@@ -25,6 +27,7 @@ public  slots:
 
 private:
     Ui::MainWindow *ui;
+    QMqttClient *Client;
     QString s_mqttHostName;
     QString s_mqttPort;
     QString s_mqttUserName;
