@@ -58,35 +58,16 @@ void MainWindow::mqttConnection()
                  ui->textEdit_topic->setEnabled((False));
                  ui->pushButtonConnection->setEnabled((False));
             }
-        };
+                         });
 
-        QObject::connect(&Client, &QMqttClient::messageReceived, [&](const QByteArray &s_message, const QMqttTopicName &topic) {
+QObject::connect(&Client, &QMqttClient::messageReceived, [&](const QByteArray &s_message, const QMqttTopicName &topic) {
 
-            qDebug() << "Received message:" << s_message << "from topic:" << topic.name();
+    qDebug() << "Received message:" << s_message << "from topic:" << topic.name();
 
-            // Vérifier que le message est une image
-            if (topic.name() == s_mqttTopic) {
-                // Enregistrer l'image dans un fichier
-//                QFile file("/home/yanis/received_image.png");
-//                if (!file.open(QIODevice::WriteOnly)) {
-//                    qDebug() << "Error opening file for writing";
-//                    return;
-//                }
-//                file.write(message);
-//                file.close();
-                ui->textBrowserMessage->setText(s_message);
-
-
-                QPixmap image(s_message);
-                QGraphicsScene *scene = new QGraphicsScene(this);
-                scene->addPixmap(image);
-                QRectF bounds = scene->itemsBoundingRect();
-                ui->graphicsView->fitInView(bounds, Qt::KeepAspectRatio);
-                ui->graphicsView->setScene(scene);
-
-                qDebug() << "Image received and saved";
-            }
-        });
+    if (topic.name() == s_mqttTopic) {
+        decodeImage(s_message);
+    }
+});
 
         Client.connectToHost();
 
@@ -94,6 +75,35 @@ void MainWindow::mqttConnection()
     {
         ui->textBrowserMessage->setText("Connection Refuse \n \nAdding informations : \n\nHostname\nPort\nUsername\nPassword\nTopic");
     }
+}
+
+void MainWindow::decodeImage(const QByteArray &s_message)
+{
+    // Charger l'image depuis le QByteArray
+    QImage image;
+    if (!image.load("/home/yanis/mqttYnov/DroneIMG37337.png")) {
+        qDebug() << "Failed to load image from message data.";
+        return;
+    }
+
+    // Extraire les bits du message caché
+    QByteArray messageBytes;
+    for (int32_t i = 0; i < image.width(); i++) {
+        for (int32_t j = 0; j < image.height(); j++) {
+            QRgb pixel = image.pixel(i, j);
+            char_t byte = 0;
+            byte |= (qRed(pixel) & 1);
+            byte <<= 1;
+            byte |= (qGreen(pixel) & 1);
+            byte <<= 1;
+            byte |= (qBlue(pixel) & 1);
+            messageBytes.append(byte);
+        }
+    }
+
+    // Décoder le message
+    QString message = QString::fromUtf8(messageBytes);
+    ui->textBrowserMessage->setText(message);
 }
 
 void MainWindow::close()
