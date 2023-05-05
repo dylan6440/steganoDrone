@@ -1,4 +1,4 @@
-QT += gui network network mqtt
+QT += gui network mqtt
 
 CONFIG += c++17 console
 CONFIG -= app_bundle
