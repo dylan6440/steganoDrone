@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include <QDebug>
 #include <QFile>
+#include <QGraphicsPixmapItem>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -62,12 +63,52 @@ void MainWindow::mqttConnection()
 
         QObject::connect(Client, &QMqttClient::messageReceived, [&](const QByteArray &s_message, const QMqttTopicName &topic) {
 
-    qDebug() << "Received message:" << s_message << "from topic:" << topic.name();
 
-    if (topic.name() == s_mqttTopic) {
-        decodeImage(s_message);
-    }
-});
+            qDebug() << "Received message:" << s_message << "from topic:" << topic.name();
+
+            // Vérifier que le message est une image
+            if (topic.name() == s_mqttTopic) {
+                  decodeImage(s_message);
+                // Enregistrer l'image dans un fichier
+//                QFile file("/home/yanis/received_image.png");
+//                if (!file.open(QIODevice::WriteOnly)) {
+//                    qDebug() << "Error opening file for writing";
+//                    return;
+//                }
+//                file.write(message);
+//                file.close();
+                ui->textBrowserMessage->setText(s_message);
+
+
+
+
+
+                QImage image;
+                QGraphicsScene *scene = new QGraphicsScene(this);
+
+                image.loadFromData(s_message);
+
+                        // Créer un QGraphicsPixmapItem avec l'image convertie
+                        QGraphicsPixmapItem *pixmapItem = new QGraphicsPixmapItem(QPixmap::fromImage(image));
+
+                        // Ajouter le QGraphicsPixmapItem à la scène
+                        scene->addItem(pixmapItem);
+
+
+
+
+
+
+//                QPixmap image(s_message);
+//                scene->addPixmap(image);
+                QRectF bounds = scene->itemsBoundingRect();
+                ui->graphicsView->fitInView(bounds, Qt::KeepAspectRatio);
+                ui->graphicsView->setScene(scene);
+
+                qDebug() << "Image received and saved";
+            }
+        });
+
 
         Client->connectToHost();
 
