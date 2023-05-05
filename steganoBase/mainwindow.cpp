@@ -28,6 +28,8 @@ void MainWindow::mqttConnection()
     s_mqttPassWord = ui->textEdit_PWMQTT->toPlainText();
     s_mqttTopic = ui->textEdit_topic->toPlainText();
 
+
+
     if ((s_mqttHostName != NULL)&&(s_mqttPort != NULL)&&(s_mqttUserName != NULL)&&(s_mqttPassWord != NULL))
     {
         QMqttClient Client;
@@ -49,6 +51,12 @@ void MainWindow::mqttConnection()
                 return;
             } else {
                 qDebug() << "Subscribed to topic:" << s_mqttTopic;
+                 ui->textEdit_HNMQTT->setEnabled((False));
+                 ui->textEdit_PMQTT->setEnabled((False));
+                 ui->textEdit_UNMQTT->setEnabled((False));
+                 ui->textEdit_PWMQTT->setEnabled((False));
+                 ui->textEdit_topic->setEnabled((False));
+                 ui->pushButtonConnection->setEnabled((False));
             }
         };
 
