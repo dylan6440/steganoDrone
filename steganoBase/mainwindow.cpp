@@ -1,6 +1,5 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include <QtMqtt/QMqttClient>
 #include <QDebug>
 #include <QFile>
 
@@ -32,35 +31,36 @@ void MainWindow::mqttConnection()
 
     if ((s_mqttHostName != NULL)&&(s_mqttPort != NULL)&&(s_mqttUserName != NULL)&&(s_mqttPassWord != NULL))
     {
-        QMqttClient Client;
+        Client = new QMqttClient(this);
+//        QMqttClient Client;
 
-        Client.setHostname(s_mqttHostName);
-        Client.setPort(s_mqttPort);
-        Client.setUsername(s_mqttUserName);
-        Client.setPassword(s_mqttPassWord);
+        Client->setHostname(s_mqttHostName);
+        Client->setPort(s_mqttPort.toInt());
+        Client->setUsername(s_mqttUserName);
+        Client->setPassword(s_mqttPassWord);
 
-        QObject::connect(&Client, &QMqttClient::connected, [&]()
+        QObject::connect(Client, &QMqttClient::connected, [&]()
         {
             qDebug() << "Connected to MQTT broker.";
 
             qint32 qos_var = 2;
 
-            if (!Client.subscribe(s_mqttTopic, qos_var))
+            if (!Client->subscribe(s_mqttTopic, qos_var))
             { // Souscription au topic contenant l'image
                 qDebug() << "Error subscribing to topic:" << s_mqttTopic;
                 return;
             } else {
                 qDebug() << "Subscribed to topic:" << s_mqttTopic;
-                 ui->textEdit_HNMQTT->setEnabled((False));
-                 ui->textEdit_PMQTT->setEnabled((False));
-                 ui->textEdit_UNMQTT->setEnabled((False));
-                 ui->textEdit_PWMQTT->setEnabled((False));
-                 ui->textEdit_topic->setEnabled((False));
-                 ui->pushButtonConnection->setEnabled((False));
+                ui->textEdit_HNMQTT->setEnabled((false));
+                ui->textEdit_PMQTT->setEnabled((false));
+                ui->textEdit_UNMQTT->setEnabled((false));
+                ui->textEdit_PWMQTT->setEnabled((false));
+                ui->textEdit_topic->setEnabled((false));
+                ui->pushButtonConnection->setEnabled((false));
             }
-        };
+        });
 
-        QObject::connect(&Client, &QMqttClient::messageReceived, [&](const QByteArray &s_message, const QMqttTopicName &topic) {
+        QObject::connect(Client, &QMqttClient::messageReceived, [&](const QByteArray &s_message, const QMqttTopicName &topic) {
 
             qDebug() << "Received message:" << s_message << "from topic:" << topic.name();
 
@@ -88,10 +88,11 @@ void MainWindow::mqttConnection()
             }
         });
 
-        Client.connectToHost();
+        Client->connectToHost();
 
     } else
     {
+
         ui->textBrowserMessage->setText("Connection Refuse \n \nAdding informations : \n\nHostname\nPort\nUsername\nPassword\nTopic");
     }
 }
