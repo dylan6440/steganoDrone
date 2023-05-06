@@ -19,14 +19,18 @@ void mqttSend::sendDataToMqtt(const QString hostName, int16_t port, QString user
     client->setPort(port);
     client->setUsername(username);
     client->setPassword(password);
+    client->setWillQoS(2);
 
     int16_t reconnectInterval = 5000; // 5 seconds
 
-     QObject::connect(client, &QMqttClient::stateChanged, [&](QMqttClient::ClientState state) {
-         qDebug() << "Client state:" << state;
+    client->connectToHost();
 
-        qint32 qos_var = 2;
+     QObject::connect(client, &QMqttClient::stateChanged, [&](QMqttClient::ClientState state) {
+
+        qint8 qos_var = 2;
         QByteArray image_data = data;
+
+        qDebug() << "Client state:" << state;
 
         // Publier l'image sur MQTT
          if (state == QMqttClient::Connected) {
@@ -36,7 +40,7 @@ void mqttSend::sendDataToMqtt(const QString hostName, int16_t port, QString user
                 qDebug() << "Published image to topic:" << topic.name();
 
                 // Déconnexion du broker MQTT
-                QObject::connect(client, &QMqttClient::connected, [&]() {
+                QTimer::singleShot(5000, [=]() {
                     client->disconnectFromHost();
                     qDebug() << "Client state:" << state;
                     exit(0);
@@ -50,6 +54,4 @@ void mqttSend::sendDataToMqtt(const QString hostName, int16_t port, QString user
             });
          }
     });
-
-    client->connectToHost();
 }

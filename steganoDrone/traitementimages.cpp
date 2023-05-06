@@ -8,6 +8,7 @@
 #include <QColor>
 #include <QImageWriter>
 #include <QBuffer>
+#include <QPixmap>
 
 traitementImages::traitementImages(QObject *parent)
     : QObject(parent)
@@ -19,53 +20,108 @@ QByteArray traitementImages::encodeImage(QString imagePath, QString secretMessag
 {
 
     QFile file(imagePath);
-    QByteArray imageData;
 
     while (!file.exists()) {
         std::cout << "Entrez le chemin d'accès à l'image : ";
         std::string imagePath;
         std::cin >> imagePath;
     }
-    // Charge l'image
+    // Charger l'image
     QImage image;
-    if (!image.load(file.fileName())) {
-        std::cerr << "Impossible de charger l'image." << std::endl;
-        return "error 0";
-    }
-    std::cout << "Image chargée." << std::endl;
-    QString message = secretMessage;
-    QByteArray messageBytes = message.toUtf8();
-    int32_t messageLength = messageBytes.size();
-    int32_t byteIndex = 0;
-    for (int32_t i = 0; i < image.width(); i++) {
-        for (int32_t j = 0; j < image.height(); j++) {
-            QRgb pixel = image.pixel(i, j);
-            int32_t red = qRed(pixel);
-            int32_t green = qGreen(pixel);
-            int32_t blue = qBlue(pixel);
-            if (byteIndex < messageLength) {
-                char_t byte = messageBytes[byteIndex];
-                red = (red & ~1) | (byte & 1);
-                byte >>= 1;
-                green = (green & ~1) | (byte & 1);
-                byte >>= 1;
-                blue = (blue & ~1) | (byte & 1);
-                byteIndex++;
-            }
-            pixel = qRgb(red, green, blue);
-            image.setPixel(i, j, pixel);
-            if (byteIndex == messageLength - 1)break;
-        }
-        if (byteIndex == messageLength - 1)break;
-    }
-    std::cout << "Message caché dans l'image." << std::endl;
 
+    if (!image.load(imagePath)) {
+        std::cerr << "Impossible de charger l'image." << std::endl;
+        return QByteArray();
+    }
+
+    image = image.convertToFormat(QImage::Format_RGB32);
+
+    // Convertir la chaîne de caractères en une séquence de bits
+    QByteArray secretData = secretMessage.toUtf8() + "!";
+    QByteArray binaryData;
+    for (int i = 0; i < secretData.size(); ++i) {
+        char byte = secretData.at(i);
+        for (int j = 0; j < 8; ++j) {
+            binaryData.append((byte & 0x80) >> 7);
+            byte <<= 1;
+        }
+    }
+
+    // Ajouter un marqueur de fin de message
+    for (int i = 0; i < 8; ++i) {
+        binaryData.append('\0');
+        if(binaryData.size() % 3 == 0)break;
+    }
+
+    // Modifier les bits LSB de chaque pixel de l'image
+    int dataIdx = 0;
+    for (int y = 0; y < image.height(); ++y) {
+        for (int x = 0; x < image.width(); ++x) {
+            QColor pixelColor = image.pixelColor(x, y);
+            if (dataIdx >= binaryData.size()) {
+                // Si toutes les données ont été encodées, sortir de la boucle
+                break;
+            }
+            pixelColor.setRed((pixelColor.red() & 0xFE) | binaryData.at(dataIdx++));
+            pixelColor.setGreen((pixelColor.green() & 0xFE) | binaryData.at(dataIdx++));
+            pixelColor.setBlue((pixelColor.blue() & 0xFE) | binaryData.at(dataIdx++));
+            image.setPixelColor(x, y, pixelColor);
+            if (dataIdx >= binaryData.size()) {
+                // Si toutes les données ont été encodées, sortir de la boucle
+                break;
+            }
+        }
+        if (dataIdx >= binaryData.size()) {
+            // Si toutes les données ont été encodées, sortir de la boucle
+            break;
+        }
+    }
+
+    // Sauvegarder l'image encodée
+    QByteArray imageData;
     QBuffer buffer(&imageData);
     buffer.open(QIODevice::WriteOnly);
     image.save(&buffer, "PNG");
 
-    QString encodedImage = QString::fromLatin1(imageData.toBase64().data());
-    std::cout << "Image encodée en base64 : " << encodedImage.toStdString() << std::endl;
+    std::cout << "Message caché dans l'image." << std::endl;
     file.close();
     return imageData;
+}
+
+QString traitementImages::decodeImage(QByteArray codedImage)
+{
+    // Load the image
+    QImage image;
+    if (!image.loadFromData(codedImage)) {
+        std::cerr << "Impossible de charger l'image." << std::endl;
+        return "error 0";
+    }
+    std::cout << "Image chargée." << std::endl;
+
+    // Décoder les bits LSB de chaque pixel de l'image pour récupérer les données cachées
+    QByteArray binaryData;
+    for (int y = 0; y < image.height(); ++y) {
+        for (int x = 0; x < image.width(); ++x) {
+            QColor pixelColor = image.pixelColor(x, y);
+            binaryData.append(pixelColor.red() & 0x01);
+            binaryData.append(pixelColor.green() & 0x01);
+            binaryData.append(pixelColor.blue() & 0x01);
+        }
+    }
+    // Convertir la séquence de bits en une chaîne de caractères
+    QByteArray secretData;
+    for (int32_t i = 0; i < binaryData.size(); i += 8) {
+        int32_t byte = 0;
+        for (int32_t j = 0; j < 8; ++j) {
+            byte <<= 1;
+            byte |= binaryData.at(i+j);
+        }
+        if (byte == '!')break;
+        secretData.append(byte);
+    }
+
+    std::cout << "Message extrait de l'image." << std::endl;
+    QString secretText = QString::fromUtf8(secretData);
+    std::cout << "Message : " << secretText.toStdString() << std::endl;
+    return secretText;
 }

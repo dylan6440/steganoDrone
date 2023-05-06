@@ -10,6 +10,7 @@ class traitementImages : public QObject
 public:
     explicit traitementImages(QObject *parent = nullptr);
     QByteArray encodeImage (QString imagePath, QString secretMessage);
+    QString decodeImage (QByteArray codedImage);
     QString defaultPath = "../steganoDrone/Images/DroneIMG37337.png";
 };
 
