@@ -39,3 +39,19 @@ Le fichier DroneIMG37337.png contenant l'image à traiter sera fourni.
 
 # PAQL
 Le PAQL (Plan d'Assurance Qualité Logiciel) sera fourni.
+
+# Resultat
+
+## Station Drone
+Pour la station sol, tous se fais automatiquement, la connexion au serveur, le chiffrage du message et l’envoie de l’image sur MQTT.
+![Screenshot from 2023-05-07 17-26-06](https://user-images.githubusercontent.com/70941138/236699700-dc9a7f5d-6ab4-4f6a-b50e-3d58a5109b14.png)
+
+## Station base
+Lancement de l'IHM (Interface Homme Machine) de la station base et connexion au serveur MQTT en rentrent les informations dans les cases dédié et appuyer sur connexion
+![Screenshot from 2023-05-07 17-25-01](https://user-images.githubusercontent.com/70941138/236699463-97a65d48-cd8d-4c25-a137-6664dfdde432.png)
+
+Une fois connecté, les cases se désactive pour confirmer la connexion
+![Screenshot from 2023-05-07 17-25-37](https://user-images.githubusercontent.com/70941138/236699569-9cb3a584-96a7-4514-be1b-ad22f9a288f0.png)
+
+Quand on reçoit des images codées sur MQTT, on retrouve sur l’IHM l’image ainsi que le code déchiffré
+![Screenshot from 2023-05-07 17-26-11](https://user-images.githubusercontent.com/70941138/236699601-08de0b63-e3e0-4a72-861b-eb61c752ef3a.png)
