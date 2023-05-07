@@ -10,7 +10,7 @@ class mqttSend: public QObject
     Q_OBJECT
 public:
     explicit mqttSend(QObject *parent = nullptr);
-    void sendDataToMqtt(const QString hostName, int16_t port, QString username, QString password, const QMqttTopicName &topic, QString data);
+    void sendDataToMqtt(const QString hostName, int16_t port, QString username, QString password, const QMqttTopicName &topic, QByteArray data);
 private:
     QMqttClient *client;
 };

@@ -22,3 +22,6 @@ HEADERS += \
     mqttsend.h \
     paql.h \
     traitementimages.h
+
+DISTFILES += \
+    Images/DroneIMG37337.png

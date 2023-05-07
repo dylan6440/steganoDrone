@@ -37,6 +37,9 @@ private:
     QString s_image;
     QThread thr_DetectedMessage;
 
+private:
+    void decodeImage(const QByteArray &s_message);
+
 };
 
 #endif // MAINWINDOW_H
