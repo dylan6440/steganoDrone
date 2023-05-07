@@ -42,7 +42,7 @@ void MainWindow::mqttConnection()
         qint32 qos_var = 2;
 
         if (!Client->subscribe(s_mqttTopic, qos_var))
-        { // Souscription au topic contenant l'image
+        { 
             qDebug() << "Error subscribing to topic:" << s_mqttTopic;
             return;
         } else {
@@ -58,22 +58,13 @@ void MainWindow::mqttConnection()
 
     QObject::connect(Client, &QMqttClient::messageReceived, [&](const QByteArray &s_message, const QMqttTopicName &topic) {
         qDebug() << "Received message:" << s_message << "from topic:" << topic.name();
-        // Vérifier que le message est une image
         if (topic.name() == s_mqttTopic) {
               decodeImage(s_message);
-            //ui->textBrowserMessage->setText(s_message);
-
             QImage image;
             QGraphicsScene *scene = new QGraphicsScene(this);
-
             image.loadFromData(s_message);
-
-            // Créer un QGraphicsPixmapItem avec l'image convertie
             QGraphicsPixmapItem *pixmapItem = new QGraphicsPixmapItem(QPixmap::fromImage(image));
-
-            // Ajouter le QGraphicsPixmapItem à la scène
             scene->addItem(pixmapItem);
-
             QRectF bounds = scene->itemsBoundingRect();
             ui->graphicsView->fitInView(bounds, Qt::KeepAspectRatio);
             ui->graphicsView->setScene(scene);
@@ -87,7 +78,6 @@ void MainWindow::mqttConnection()
 
 void MainWindow::decodeImage(const QByteArray &s_message)
 {
-    // Charger l'image depuis le QByteArray
     QImage image;
     if (!image.loadFromData(s_message)) {
         qDebug() << "Failed to load image from message data.";
@@ -95,8 +85,6 @@ void MainWindow::decodeImage(const QByteArray &s_message)
     }
 
     std::cout << "Image chargée." << std::endl;
-
-                // Décoder les bits LSB de chaque pixel de l'image pour récupérer les données cachées
                 QByteArray binaryData;
     for (int y = 0; y < image.height(); ++y) {
         for (int x = 0; x < image.width(); ++x) {
@@ -106,7 +94,6 @@ void MainWindow::decodeImage(const QByteArray &s_message)
             binaryData.append(pixelColor.blue() & 0x01);
         }
     }
-    // Convertir la séquence de bits en une chaîne de caractères
     QByteArray secretData;
     for (int32_t i = 0; i < binaryData.size(); i += 8) {
         int32_t byte = 0;
